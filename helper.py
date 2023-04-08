@@ -52,7 +52,7 @@ def elapsed_time(start_time):
     return time_str
 
 
-def export_map_to_excel_with_formatting(df, wb_path, ws_name):
+def export_map_to_excel_with_formatting_deprecated(df, wb_path, ws_name):
     """
     Export a DataFrame to an Excel file with conditional formatting using openpyxl.
 
@@ -90,13 +90,10 @@ def export_map_to_excel_with_formatting(df, wb_path, ws_name):
                                                     "font_color": colo_house_with_parcel,
                                                     "border": 1})
     format_empty_lot = workbook.add_format({"bg_color": colo_empty_lot, "font_color": colo_empty_lot})
-    format_depot = workbook.add_format({"bg_color": colo_depot, "font_color": colo_depot})
-    format_column = workbook.add_format({"align":"center", 'valign': "vcenter"})
+    format_depot = workbook.add_format({"bg_color": colo_depot, "font_color": colo_depot, "border": 1})
+    format_column = workbook.add_format({"align": "center", 'valign': "vcenter"})
 
     (max_row, max_col) = df.shape
-
-    worksheet.set_column(0, max_col, column_width, format_column)
-    worksheet.set_default_row(row_height)
 
     # Define the conditional formatting rules
     # Street format
@@ -130,19 +127,78 @@ def export_map_to_excel_with_formatting(df, wb_path, ws_name):
                                   "value": '"D"',
                                   "format": format_depot})
 
+    worksheet.set_column(0, max_col, column_width, format_column)
+    worksheet.set_default_row(row_height)
+
     # Close the Pandas Excel writer and save the Excel file
     writer._save()
 
-    print(f"DataFrame has been successfully exported to {wb_path}")
 
 
-# TODO fix the export
+def export_map_to_excel_with_formatting(df, wb_path, ws_name):
+    # Define style parameter
+    colo_street = "#A6A6A6"
+    colo_house_no_parcel = "#95B8D1"
+    colo_house_with_parcel = "#9B1D20"  # "#522B47"
+    colo_depot = "#F77F00"
+    colo_empty_lot = "#566E3D"
+    column_width = 3
+    row_height = 12
 
-data = {'Name': ['Alice', 'D', 'H'],
-        'Age': [25, 30, 35],
-        'City': [' ', '.', 'P']}
-test_df = pd.DataFrame(data)
+    # Create a Pandas Excel writer
+    writer = pd.ExcelWriter(wb_path, engine='xlsxwriter')
 
-export_map_to_excel_with_formatting(test_df,
-                                    r"C:\Users\fhaum\OneDrive\401 MASTER - Masterarbeit\04 Kalkulationen\pythonProject\PathVisualisation_TEST.xlsx",
-                                    "VIS")
+    # Write the DataFrame to the Excel file
+    #df.insert(0, 'Row', df.index + 1)  # Add a new column with row numbers, starting from 1
+    df.to_excel(writer, sheet_name=ws_name)
+
+    # Get the workbook and worksheet objects
+    workbook = writer.book
+    worksheet = writer.sheets[ws_name]
+
+    format_street = workbook.add_format({"bg_color": colo_street, "font_color": colo_street})
+    format_house_no_parcel = workbook.add_format({"bg_color": colo_house_no_parcel,
+                                                  "font_color": colo_house_no_parcel,
+                                                  "border": 1})
+    format_house_with_parcel = workbook.add_format({"bg_color": colo_house_with_parcel,
+                                                    "font_color": colo_house_with_parcel,
+                                                    "border": 1})
+    format_empty_lot = workbook.add_format({"bg_color": colo_empty_lot, "font_color": colo_empty_lot})
+    format_depot = workbook.add_format({"bg_color": colo_depot, "font_color": colo_depot, "border": 1})
+    format_column = workbook.add_format({"align": "center", 'valign': "vcenter"})
+
+    (max_row, max_col) = df.shape
+
+    for index, row in df.iterrows():
+        for col_num, value in enumerate(row):
+            # Get the cell address
+            cell_address = xlsxwriter.utility.xl_col_to_name(col_num + 1) + str(
+                index + 2)  # +1 for the additional column, +2 to account for header row
+
+            # Apply the cell format based on the value
+            if value == " ":
+                worksheet.write(cell_address, value, format_street)
+            elif value == ".":
+                worksheet.write(cell_address, value, format_empty_lot)
+            elif value == "H":
+                worksheet.write(cell_address, value, format_house_no_parcel)
+            elif value == "P":
+                worksheet.write(cell_address, value, format_house_with_parcel)
+            elif value == "D":
+                worksheet.write(cell_address, value, format_depot)
+            else:
+                worksheet.write(cell_address, value)
+    worksheet.set_column(1, max_col, column_width, format_column)  # Start from column 1 to exclude index column
+    worksheet.set_default_row(row_height)
+
+    # Close the Pandas Excel writer and save the Excel file
+    writer._save()
+
+# data = {'Name': ['Alice', 'D', 'H'],
+#         'Age': [25, 30, 35],
+#         'City': [' ', '.', 'P']}
+# test_df = pd.DataFrame(data)
+#
+# export_map_to_excel_with_formatting_2(test_df,
+#                                       r"C:\Users\fhaum\OneDrive\401 MASTER - Masterarbeit\04 Kalkulationen\pythonProject\PathVisualisation_TEST.xlsx",
+#                                       "VIS")
