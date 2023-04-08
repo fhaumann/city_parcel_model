@@ -50,3 +50,51 @@ def elapsed_time(start_time):
     print(time_str)
     return time_str
 
+
+
+def export_pd_to_excel_with_formatting(df, wb_path, ws_name):
+    import pandas as pd
+    from openpyxl import load_workbook
+
+    # Create a Pandas Excel writer object
+    ws_name = 'Sheet1'  # Worksheet name
+    wb_path = 'output.xlsx'  # Output file path
+    writer = pd.ExcelWriter(wb_path, engine='openpyxl')
+    df.to_excel(writer, sheet_name=ws_name, index=False)
+
+    # Load the workbook
+    workbook = writer.book
+
+    # Get the worksheet object
+    worksheet = writer.sheets[ws_name]
+
+    # Save the workbook to apply conditional formatting
+    workbook.save(wb_path)
+
+    # Load the workbook again
+    workbook = load_workbook(wb_path)
+
+    # Get the worksheet object
+    worksheet = workbook[ws_name]
+
+    # Get the conditional formatting rules from the original worksheet
+    for rule in worksheet.conditional_formatting._cf_rules:
+        worksheet.conditional_formatting.add(rule)
+
+    # Save the workbook with the applied conditional formatting
+    workbook.save(wb_path)
+
+    # Close the Pandas Excel writer
+    writer.close()
+
+
+
+data = {'Name': ['Alice', 'Bob', 'Charlie'],
+        'Age': [25, 30, 35],
+        'City': ['New York', 'Los Angeles', 'Chicago']}
+test_df = pd.DataFrame(data)
+
+export_pd_to_excel_with_formatting(test_df, r"C:\Users\fhaum\OneDrive\401 MASTER - Masterarbeit\04 Kalkulationen\pythonProject\PathVisualisation_TEST.xlsx","test")
+
+
+
