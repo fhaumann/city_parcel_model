@@ -1,4 +1,6 @@
 import string
+import time
+from datetime import timedelta
 import pandas as pd
 
 
@@ -35,4 +37,16 @@ def read_df_from_csv(csv_name_no_filetype: str, with_header_and_rows: bool = Fal
     else:
         return_df = pd.read_csv(csv_full_path, header=None, index_col=None)
     return return_df
+
+
+def elapsed_time(start_time):
+    end_time = time.time()
+    elapsed_seconds = int(end_time - start_time)
+    elapsed_time = timedelta(seconds=elapsed_seconds)
+    hours = elapsed_time.seconds // 3600
+    minutes = (elapsed_time.seconds % 3600) // 60
+    seconds = elapsed_time.seconds % 60
+    time_str = '{:02d}:{:02d}:{:02d}'.format(hours, minutes, seconds)
+    print(time_str)
+    return time_str
 
