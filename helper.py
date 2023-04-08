@@ -18,14 +18,21 @@ def generate_letter_combinations(length:int=3):
                             yield c1 + c2 + c3
 
 
-def save_df_as_csv(df_to_save: pd.DataFrame, csv_name_no_filetype: str):
+def save_df_as_csv(df_to_save: pd.DataFrame, csv_name_no_filetype: str, with_header_and_rows: bool = False):
     csv_base_path = r"C:\Users\fhaum\OneDrive\401 MASTER - Masterarbeit\04 Kalkulationen\pythonProject\csv_files"
     csv_full_path = csv_base_path + "\\" + csv_name_no_filetype + ".csv"
-    df_to_save.to_csv(csv_full_path, index=False, header=False)
+    if with_header_and_rows:
+        df_to_save.to_csv(csv_full_path,index=True, header=True)
+    else:
+        df_to_save.to_csv(csv_full_path, index=False, header=False)
 
 
-def read_df_from_csv(csv_name_no_filetype: str):
+def read_df_from_csv(csv_name_no_filetype: str, with_header_and_rows: bool = False):
     csv_base_path = r"C:\Users\fhaum\OneDrive\401 MASTER - Masterarbeit\04 Kalkulationen\pythonProject\csv_files"
     csv_full_path = csv_base_path + "\\" + csv_name_no_filetype + ".csv"
-    return_df = pd.read_csv(csv_full_path, header=None, index_col=None)
+    if with_header_and_rows:
+        return_df = pd.read_csv(csv_full_path, header=0, index_col=0)
+    else:
+        return_df = pd.read_csv(csv_full_path, header=None, index_col=None)
     return return_df
+
