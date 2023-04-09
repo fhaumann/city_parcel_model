@@ -28,6 +28,7 @@ def save_df_as_csv(df_to_save: pd.DataFrame, csv_name_no_filetype: str, with_hea
         df_to_save.to_csv(csv_full_path, index=True, header=True)
     else:
         df_to_save.to_csv(csv_full_path, index=False, header=False)
+    return f"'{csv_name_no_filetype} saved successfully to {csv_base_path}"
 
 
 def read_df_from_csv(csv_name_no_filetype: str, with_header_and_rows: bool = False):
